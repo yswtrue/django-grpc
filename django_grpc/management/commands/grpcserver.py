@@ -2,6 +2,7 @@ import datetime
 import time
 import grpc
 import sys
+import asyncio
 
 from django.core.management.base import BaseCommand
 from concurrent import futures
@@ -17,7 +18,8 @@ class Command(BaseCommand):
         parser.add_argument('--max_workers', type=int, help="Number of workers")
         parser.add_argument('--port', type=int, default=50051, help="Port number to listen")
         parser.add_argument('--autoreload', action='store_true', default=False)
-        parser.add_argument('--list-handlers', action='store_true', default=False, help="Print all registered endpoints")
+        parser.add_argument('--list-handlers', action='store_true',
+                            default=False, help="Print all registered endpoints")
 
     def handle(self, *args, **options):
         if options['autoreload'] is True:
@@ -34,6 +36,7 @@ class Command(BaseCommand):
     def _serve(self, max_workers, port, *args, **kwargs):
         autoreload.raise_last_exception()
         self.stdout.write("Starting server at %s" % datetime.datetime.now())
+        asyncio.set_event_loop(asyncio.new_event_loop())
 
         server = create_server(max_workers, port)
         server.start()
@@ -46,6 +49,3 @@ class Command(BaseCommand):
                 self.stdout.write("* %s" % handler)
 
         server.wait_for_termination()
-
-
-
