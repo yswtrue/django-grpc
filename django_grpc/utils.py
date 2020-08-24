@@ -19,8 +19,8 @@ def create_server(max_workers, port, interceptors=None):
     maximum_concurrent_rpcs = config.get('maximum_concurrent_rpcs', None)
 
     # create a gRPC server
-    server = grpc.server(
-        thread_pool=futures.ThreadPoolExecutor(max_workers=max_workers),
+    server = grpc.experimental.aio.server(
+        migration_thread_pool=futures.ThreadPoolExecutor(max_workers=max_workers),
         interceptors=interceptors,
         maximum_concurrent_rpcs=maximum_concurrent_rpcs
     )
